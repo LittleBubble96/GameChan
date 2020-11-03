@@ -61,6 +61,8 @@
      <Compile Include="Assets\ConversationNode.cs" />
      <Compile Include="Assets\ConversationNodeController.cs" />
      <Compile Include="Assets\ConversationNodeTranslation.cs" />
+     <Compile Include="Assets\Scripts\Animator\XX_AnimationStateInfo.cs" />
+     <Compile Include="Assets\Scripts\Animator\XX_AttackManager.cs" />
      <Compile Include="Assets\UnityChanTPK\Script\SpringBone\AngleLimits.cs" />
      <Compile Include="Assets\UnityChanTPK\Script\SpringBone\Colliders\Circle3.cs" />
      <Compile Include="Assets\UnityChanTPK\Script\SpringBone\Colliders\SpringCapsuleCollider.cs" />

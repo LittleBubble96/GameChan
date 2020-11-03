@@ -82,15 +82,20 @@ namespace RootMotion.Demos {
 				// but we don't want to use that while airborne
 				animator.speed = 1;
 			}
+
+			OnMove();
+
+			
 		}
 
 		// Call OnAnimatorMove manually on the character controller because it doesn't have the Animator component
-		void OnAnimatorMove() {
+		void OnMove() {
 			// For not using root rotation in Turn value calculation 
 			Vector3 f = animator.deltaRotation * Vector3.forward;
 			deltaAngle += Mathf.Atan2(f.x, f.z) * Mathf.Rad2Deg;
-
-            characterController.Move(animator.deltaPosition, animator.deltaRotation);
+			characterController.Move(animator.deltaPosition, animator.deltaRotation);
 		}
+
+		
 	}
 }

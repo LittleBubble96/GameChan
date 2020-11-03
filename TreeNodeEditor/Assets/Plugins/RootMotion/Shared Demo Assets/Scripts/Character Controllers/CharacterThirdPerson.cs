@@ -24,13 +24,16 @@ namespace RootMotion.Demos {
 			public bool isStrafing; // should the character always rotate to face the move direction or strafe?
 			public float yVelocity; // y velocity of the character
 			public bool doubleJump;
+			public bool walk;//should the character be walking?
+			public bool run;//should the character be running?
+			public int attackIndex;//should the character be normalAttack?
 		}
 
 		[Header("References")]
 		public CharacterAnimationBase characterAnimation; // the animation controller
 		public UserControlThirdPerson userControl; // user input
 		public CameraController cam; // Camera controller (optional). If assigned will update the camera in LateUpdate only if character moves
-
+		
 		[Header("Movement")]
 		public MoveMode moveMode; // Is the character always rotating to face the move direction or is he strafing?
 		public bool smoothPhysics = true; // If true, will use interpolation to smooth out the fixed time step.
@@ -104,8 +107,8 @@ namespace RootMotion.Demos {
 			if (cam != null) cam.enabled = false;
 		}
 
-		void OnAnimatorMove() {
-			Move (animator.deltaPosition, animator.deltaRotation);
+		void OnMove() {
+			Move (userControl.state.move*0.1f, animator.deltaRotation);
 		}
 
 		// When the Animator moves
@@ -115,7 +118,8 @@ namespace RootMotion.Demos {
 			fixedDeltaRotation *= deltaRotation;
 		}
 
-		void FixedUpdate() {
+		void FixedUpdate()
+		{
             gravity = GetGravity();
 
 			verticalVelocity = V3Tools.ExtractVertical(r.velocity, gravity, 1f);
@@ -133,7 +137,9 @@ namespace RootMotion.Demos {
 			r.interpolation = smoothPhysics? RigidbodyInterpolation.Interpolate: RigidbodyInterpolation.None;
 			characterAnimation.smoothFollow = smoothPhysics;
 
+
             // Move
+            OnMove();
 			MoveFixed(fixedDeltaPosition);
 			fixedDeltaPosition = Vector3.zero;
 
@@ -195,7 +201,10 @@ namespace RootMotion.Demos {
 			animState.yVelocity = Mathf.Lerp(animState.yVelocity, velocityY, Time.deltaTime * 10f);
 			animState.crouch = userControl.state.crouch;
 			animState.isStrafing = moveMode == MoveMode.Strafe;
-		}
+			animState.walk = userControl.state.walk;
+			animState.run = userControl.state.run;
+			animState.attackIndex = userControl.state.attackIndex;
+        }
 
 		protected virtual void LateUpdate() {
 			if (cam == null) return;
@@ -247,7 +256,7 @@ namespace RootMotion.Demos {
 			}
 
 			r.velocity = horizontalVelocity + verticalVelocity;
-
+			//Debug.Log("r.velocity "+r.velocity);
             // Dampering forward speed on the slopes (Not working since Unity 2017.2)
             //float slopeDamper = !onGround? 1f: GetSlopeDamper(-deltaPosition / Time.deltaTime, normal);
             //forwardMlp = Mathf.Lerp(forwardMlp, slopeDamper, Time.deltaTime * 5f);
@@ -301,6 +310,7 @@ namespace RootMotion.Demos {
 
 			// Rotate from upright to wall normal
 			transform.rotation = Quaternion.Slerp(Quaternion.LookRotation(f, -gravity), Quaternion.LookRotation(fW, wallNormal), wallRunWeight);
+
 		}
 
 		// Should the character be enabled to do a wall run?
@@ -318,7 +328,6 @@ namespace RootMotion.Demos {
 			case MoveMode.Directional:
 				moveDirection = Vector3.SmoothDamp(moveDirection, new Vector3(0f, 0f, userControl.state.move.magnitude), ref moveDirectionVelocity, smoothAccelerationTime);
 				moveDirection = Vector3.MoveTowards(moveDirection, new Vector3(0f, 0f, userControl.state.move.magnitude), Time.deltaTime * linearAccelerationSpeed);
-				Debug.Log("moveDirection * forwardMlp:"+moveDirection * forwardMlp);
 				return moveDirection * forwardMlp;
 			case MoveMode.Strafe:
 				moveDirection = Vector3.SmoothDamp(moveDirection, userControl.state.move, ref moveDirectionVelocity, smoothAccelerationTime);

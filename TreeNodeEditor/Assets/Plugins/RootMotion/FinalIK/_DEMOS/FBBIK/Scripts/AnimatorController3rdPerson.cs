@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 using RootMotion.FinalIK;
 
@@ -26,7 +27,7 @@ namespace RootMotion.Demos {
 		// Moving the character
 		void OnAnimatorMove() {
 			velocity = Vector3.Lerp (velocity, transform.rotation * Vector3.ClampMagnitude(moveInput, 1f) * moveSpeed, Time.deltaTime * blendSpeed);
-
+		
 			// Crossfading between procedural movement and root motion.
 			transform.position += Vector3.Lerp(velocity * Time.deltaTime, animator.deltaPosition, rootMotionWeight);
 		}
@@ -59,6 +60,11 @@ namespace RootMotion.Demos {
 			animator.SetFloat("X", moveBlend.x);
 			animator.SetFloat("Z", moveBlend.z);
 			animator.SetBool("IsMoving", isMoving);
+		}
+
+		private void Update()
+		{
+			//OnMove();
 		}
 	}
 }

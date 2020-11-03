@@ -7810,6 +7810,7 @@ GameObject:
   - component: {fileID: 422479138}
   - component: {fileID: 422479137}
   - component: {fileID: 422479136}
+  - component: {fileID: 422479144}
   m_Layer: 0
   m_Name: 01_kohaku_A (1)
   m_TagString: Player
@@ -8389,10 +8390,10 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.11668281
-  m_Height: 1.4591826
+  m_Radius: 0.1301862
+  m_Height: 1.4716836
   m_Direction: 1
-  m_Center: {x: 0, y: 0.72988325, z: -0.023394987}
+  m_Center: {x: 0, y: 0.72363275, z: -0.023131922}
 --- !u!54 &422479141
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -8619,14 +8620,26 @@ Animator:
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 8ca7b932c0de3b7478dc4385b041fa91, type: 3}
   m_Controller: {fileID: 9100000, guid: 3edd849dcbc651e48a27978863c465ad, type: 2}
-  m_CullingMode: 1
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_ApplyRootMotion: 1
+  m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &422479144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 422479134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d35ede87acf7e742b5f90acd3bd62f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &424300899
 GameObject:
   m_ObjectHideFlags: 0

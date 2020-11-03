@@ -14,6 +14,9 @@ namespace RootMotion.Demos {
 			public Vector3 lookPos;
 			public bool crouch;
 			public bool jump;
+			public bool run;
+			public bool walk;
+			public int  attackIndex;
 			public int actionIndex;
 		}
 
@@ -34,13 +37,13 @@ namespace RootMotion.Demos {
 			// read inputs
 			state.crouch = canCrouch && Input.GetKey(KeyCode.C);
 			state.jump = canJump && Input.GetButton("Jump");
-
+			
 			float h = Input.GetAxisRaw("Horizontal");
 			float v = Input.GetAxisRaw("Vertical");
 			
 			// calculate move direction
 			Vector3 move = cam.rotation * new Vector3(h, 0f, v).normalized;
-
+			
 			// Flatten move vector to the character.up plane
 			if (move != Vector3.zero) {
 				Vector3 normal = transform.up;
@@ -49,7 +52,10 @@ namespace RootMotion.Demos {
 			} else state.move = Vector3.zero;
 
 			bool walkToggle = Input.GetKey(KeyCode.LeftShift);
-
+			state.run = walkToggle && move != Vector3.zero;
+			state.walk = !walkToggle && move != Vector3.zero;
+			state.attackIndex = Input.GetKey(KeyCode.Alpha1) ? 1 : 0;
+			
 			// We select appropriate speed based on whether we're walking by default, and whether the walk/run toggle button is pressed:
 			float walkMultiplier = (walkByDefault ? walkToggle ? 1 : 0.5f : walkToggle ? 0.5f : 1);
 
