@@ -447,6 +447,9 @@ ModelImporter:
   - first:
       137: 13700002
     second: OBJ_Sword_02
+  - first:
+      74: -6777788383108301760
+    second: OrientalSword_COMBOATTACK01 (1)
   externalObjects:
   - first:
       type: UnityEngine:Material

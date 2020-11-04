@@ -27,36 +27,83 @@ public class XX_AnimationStateInfo
     /// 中断时间
     /// </summary>
     public float BreakTime;
-    
-    
 
-    public XX_AnimationStateInfo(Animator animator,string animationState,float breakTime)
+    /// <summary>
+    /// 是否可行走
+    /// </summary>
+    public bool UnAction = false;
+
+    /// <summary>
+    /// 动画初始帧
+    /// </summary>
+    public float StartFrame;
+    
+    /// <summary>
+    /// 动画片段
+    /// </summary>
+    private AnimationClip _animationClip;
+    
+    
+    
+    public XX_AnimationStateInfo(Animator animator,string animationState,float breakTime,bool unAction)
     {
         _animator = animator;
         AnimationName = animationState.Split('.')[1];
         AnimationStateHash = Animator.StringToHash(animationState);
-        AnimationLength = GetLength();
         BreakTime = breakTime;
+        UnAction = unAction;
+        StartFrame = 0;
+        //获取片段
+        foreach (AnimationClip clip in _animator.runtimeAnimatorController.animationClips)
+        {
+            if (clip.name.Equals(AnimationName))
+            {
+                _animationClip = clip;
+                break;
+            }
+        }
+
+        AnimationLength = _animationClip.length;
+
+        Debug.Log("animationState:" + AnimationLength);
+        if (BreakTime > AnimationLength)
+        {
+            Debug.LogError($"中断时间大于动画时间：中断时间为：{BreakTime}，动画时间为：{AnimationLength}");
+        }
+    }
+    
+    public XX_AnimationStateInfo(Animator animator,string animationState,float breakTime,bool unAction,float startFrame,float animationLength)
+    {
+        _animator = animator;
+        AnimationName = animationState.Split('.')[1];
+        AnimationStateHash = Animator.StringToHash(animationState);
+        BreakTime = breakTime;
+        UnAction = unAction;
+        StartFrame = startFrame;
+        //获取片段
+        foreach (AnimationClip clip in _animator.runtimeAnimatorController.animationClips)
+        {
+            if (clip.name.Equals(AnimationName))
+            {
+                _animationClip = clip;
+                break;
+            }
+        }
+
+        AnimationLength = animationLength;
+
+        Debug.Log("animationState:" + AnimationLength);
         if (BreakTime > AnimationLength)
         {
             Debug.LogError($"中断时间大于动画时间：中断时间为：{BreakTime}，动画时间为：{AnimationLength}");
         }
     }
 
-    //获取动画时长
-    private float GetLength()
+    public void PlayFrame(float frameIndex,float currentTime)
     {
-        float length = 0;
-        AnimationClip[] clips = _animator.runtimeAnimatorController.animationClips;
-        foreach (AnimationClip clip in clips)
-        {
-            if (clip.name.Equals(AnimationName))
-            {
-                length = clip.length;
-                break;
-            }
-        }
-        return length;
+        _animator.gameObject.SetActive(false);
+        _animator.gameObject.SetActive(true);
+        //更新动画到指定帧
+        _animator.Update(frameIndex);
     }
-    
 }
