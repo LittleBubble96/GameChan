@@ -37,6 +37,11 @@ public class XX_AnimationStateInfo
     /// 动画初始帧
     /// </summary>
     public float StartFrame;
+
+    /// <summary>
+    /// 可施放下一个攻击的时间
+    /// </summary>
+    public float GetNextAttackTime;
     
     /// <summary>
     /// 动画片段
@@ -45,13 +50,14 @@ public class XX_AnimationStateInfo
     
     
     
-    public XX_AnimationStateInfo(Animator animator,string animationState,float breakTime,bool unAction)
+    public XX_AnimationStateInfo(Animator animator,string animationState,float breakTime,bool unAction,float getNextAttackTime)
     {
         _animator = animator;
         AnimationName = animationState.Split('.')[1];
         AnimationStateHash = Animator.StringToHash(animationState);
         BreakTime = breakTime;
         UnAction = unAction;
+        GetNextAttackTime = getNextAttackTime;
         StartFrame = 0;
         //获取片段
         foreach (AnimationClip clip in _animator.runtimeAnimatorController.animationClips)
@@ -72,7 +78,7 @@ public class XX_AnimationStateInfo
         }
     }
     
-    public XX_AnimationStateInfo(Animator animator,string animationState,float breakTime,bool unAction,float startFrame,float animationLength)
+    public XX_AnimationStateInfo(Animator animator,string animationState,float breakTime,bool unAction,float startFrame,float animationLength,float getNextAttackTime)
     {
         _animator = animator;
         AnimationName = animationState.Split('.')[1];
@@ -80,6 +86,8 @@ public class XX_AnimationStateInfo
         BreakTime = breakTime;
         UnAction = unAction;
         StartFrame = startFrame;
+        GetNextAttackTime = getNextAttackTime;
+
         //获取片段
         foreach (AnimationClip clip in _animator.runtimeAnimatorController.animationClips)
         {
@@ -92,18 +100,24 @@ public class XX_AnimationStateInfo
 
         AnimationLength = animationLength;
 
-        Debug.Log("animationState:" + AnimationLength);
         if (BreakTime > AnimationLength)
         {
             Debug.LogError($"中断时间大于动画时间：中断时间为：{BreakTime}，动画时间为：{AnimationLength}");
         }
     }
 
-    public void PlayFrame(float frameIndex,float currentTime)
+    
+    public void PlayRestartFrame(float frameIndex)
     {
         _animator.gameObject.SetActive(false);
         _animator.gameObject.SetActive(true);
         //更新动画到指定帧
+        //_animator.Play(AnimationStateHash,la);
+        _animator.Update(frameIndex);
+    }
+
+    public void PlayUpdate(float frameIndex,int layer)
+    {
         _animator.Update(frameIndex);
     }
 }

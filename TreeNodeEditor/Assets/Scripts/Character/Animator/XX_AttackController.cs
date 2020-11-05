@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using RootMotion.Demos;
 using UnityEngine;
 
-public class XX_AttackManager : MonoBehaviour
+public class XX_AttackController : MonoBehaviour
 {
     private CharacterThirdPerson characterController;
 
@@ -38,10 +38,13 @@ public class XX_AttackManager : MonoBehaviour
     private List<XX_AnimationStateInfo> _stateInfos = new List<XX_AnimationStateInfo>();
 
     private XX_AnimationStateInfo _curStateInfo;
+    private XX_AnimationStateInfo _normalNextStateInfo;
 
     private float _curStateTime;
 
-    private XX_AnimationStateInfo _normalStateInfo;
+    private XX_AnimationStateInfo normalStateInfo;
+    private XX_AnimationStateInfo normal1StateInfo;
+    private XX_AnimationStateInfo normal2StateInfo;
 
     /// <summary>
     /// 是否正在攻击中
@@ -55,11 +58,11 @@ public class XX_AttackManager : MonoBehaviour
     #region 层级权值参数
 
     private float tempUpLayerTime;
-    private float upLayerTime = 0.1f;
+    private float upLayerTime = 0.3f;
     private float lastUpLayerWeight;
     private float endUpLayerWeight;
     private float tempDownLayerTime;
-    private float downLayerTime = 0.1f;
+    private float downLayerTime = 0.3f;
     private float lastDownLayerWeight;
     private float endDownLayerWeight;
 
@@ -68,12 +71,12 @@ public class XX_AttackManager : MonoBehaviour
     #region 攻击树 属性参数
 
     private float tempHorParameterTime;
-    private float horParameterTime = 0.2f;
+    private float horParameterTime = 0.3f;
     private float lastHorParameter;
     private float endHorParameter;
     
     private float tempVerParameterTime;
-    private float verParameterTime = 0.2f;
+    private float verParameterTime = 0.3f;
     private float lastVerParameter;
     private float endVerParameter;
     #endregion
@@ -129,7 +132,10 @@ public class XX_AttackManager : MonoBehaviour
             _curStateTime += Time.deltaTime;
             if (_curStateTime > _curStateInfo.AnimationLength)
             {
-                OnExitState(_curStateInfo);
+                if (_normalNextStateInfo==_curStateInfo||_normalNextStateInfo==null)
+                {
+                    OnExitState(_curStateInfo);
+                }
             }
         }
 
@@ -141,10 +147,18 @@ public class XX_AttackManager : MonoBehaviour
     void OnAttack()
     {
         bool canAttack = characterController.animState.attackIndex != 0;
-        canAttack &= _curStateInfo == null ||(_curStateInfo != null && _curStateTime > _curStateInfo.BreakTime);
+        canAttack &= _curStateInfo == null ||(_curStateInfo != null && _curStateTime >= _curStateInfo.AnimationLength);
+
+        canAttack |= (_curStateInfo != null && _normalNextStateInfo != null && _curStateTime >= _curStateInfo.AnimationLength);
 
         if (IsAttacking)
         {
+            if (characterController.animState.attackIndex==1 && IsCurAttackNormal())
+            {
+                _normalNextStateInfo = _curStateInfo == normalStateInfo ? normal1StateInfo :
+                    _curStateInfo == normal1StateInfo ? normal2StateInfo :
+                    _curStateInfo == normal2StateInfo ? normalStateInfo : null;
+            }
             //判断是否在其他不同行为 例如 走，跳，蹲下
             bool isAction = !characterController.animState.onGround;
             isAction |= characterController.animState.run;
@@ -162,7 +176,8 @@ public class XX_AttackManager : MonoBehaviour
         }
 
         //TODO 获取合适得状态
-        SetCurStateInfo(_normalStateInfo);
+        //XX_AnimationStateInfo stateInfo;
+        SetCurStateInfo(_normalNextStateInfo ?? normalStateInfo);
         SetAttackHorParameter(1);
         SetUpBodyLayerWeight(1);
 
@@ -217,7 +232,6 @@ public class XX_AttackManager : MonoBehaviour
     void SetCurStateInfo(XX_AnimationStateInfo stateInfo)
     {
         _curStateInfo = stateInfo;
-        _curStateInfo.PlayFrame(_curStateInfo.StartFrame,_curStateTime);
         _curStateTime = 0;
         IsAttacking = true;
         animator.SetBool(isAttack,IsAttacking);
@@ -239,15 +253,31 @@ public class XX_AttackManager : MonoBehaviour
         IsAttacking = false;
         animator.SetBool(isAttack,IsAttacking);
         _isAction = null;
+        _normalNextStateInfo = null;
     }
-    
+
+    /// <summary>
+    /// 判断是否是普通攻击
+    /// </summary>
+    /// <returns></returns>
+    public bool IsCurAttackNormal()
+    {
+        return _curStateInfo == normalStateInfo ||
+               _curStateInfo == normal1StateInfo ||
+               _curStateInfo == normal2StateInfo;
+    }
+
     /// <summary>
     /// 初始化攻击动画
     /// </summary>
     void InitStateInfos()
     {
-        _normalStateInfo = new XX_AnimationStateInfo(animator, "UpBody.OrientalSword_COMBOATTACK01", 0.6f, true, 0f, 0.6f);
-        _stateInfos.Add(_normalStateInfo);
+        normalStateInfo = new XX_AnimationStateInfo(animator, "UpBody.OrientalSword_COMBOATTACK01", 0.5f, true, 0f, 0.5f,0.5f);
+        normal1StateInfo = new XX_AnimationStateInfo(animator, "UpBody.OrientalSword_COMBOATTACK01", 0.6f, true, 0.5f, 0.6f,0.6f);
+        normal2StateInfo = new XX_AnimationStateInfo(animator, "UpBody.OrientalSword_COMBOATTACK01", 0.9f, true, 1.1f, 0.9f,0.9f);
+        _stateInfos.Add(normalStateInfo);
+        _stateInfos.Add(normal1StateInfo);
+        _stateInfos.Add(normal2StateInfo);
     }
 
    

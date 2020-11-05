@@ -54,7 +54,7 @@ namespace RootMotion.Demos {
 			bool walkToggle = Input.GetKey(KeyCode.LeftShift);
 			state.run = walkToggle && move != Vector3.zero;
 			state.walk = !walkToggle && move != Vector3.zero;
-			state.attackIndex = Input.GetKey(KeyCode.Alpha1) ? 1 : 0;
+			state.attackIndex = Input.GetKeyDown(KeyCode.Alpha1) ? 1 : 0;
 			
 			// We select appropriate speed based on whether we're walking by default, and whether the walk/run toggle button is pressed:
 			float walkMultiplier = (walkByDefault ? walkToggle ? 1 : 0.5f : walkToggle ? 0.5f : 1);
